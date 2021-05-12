@@ -6674,31 +6674,31 @@ May return a Point or LineString in the case of degenerate inputs.`,
 		defProps(),
 		tree.Overload{
 			Types: tree.ArgTypes{
-				{"linestringA", types.Geometry},
-				{"linestringB", types.Geometry},
+				{"linestring_a", types.Geometry},
+				{"linestring_b", types.Geometry},
 			},
 			ReturnType: tree.FixedReturnType(types.Int),
 			Fn: func(ctx *tree.EvalContext, args tree.Datums) (tree.Datum, error) {
-				linestringA := tree.MustBeDGeometry(args[0])
-				linestringB := tree.MustBeDGeometry(args[1])
+				linestring_a := tree.MustBeDGeometry(args[0])
+				linestring_b := tree.MustBeDGeometry(args[1])
 
-				ret, err := geomfn.LineCrossingDirection(linestringA.Geometry, linestringB.Geometry)
+				ret, err := geomfn.LineCrossingDirection(linestring_a.Geometry, linestring_b.Geometry)
 				if err != nil {
 					return nil, err
 				}
 				return tree.NewDInt(tree.DInt(ret)), nil
 			},
 			Info: infoBuilder{
-				info: "Returns diffrent interger value defining behaviour of crossing of lines\n" +
-					"0: Line No Cross\n" +
-					"-1: Line2 crosses Line 1 from Right to Left\n" +
-					"1: Line2 crosses Line 1 from Left to Right\n" +
-					"-2: Line2 Multicrosses Line1 from Right to Left\n" +
-					"2: Line2 Multicrosses Line1 from Left to Right\n" +
-					"-3: Line2 Multicrosses Line1 from Left to Left\n" +
-					"3: Line2 Multicrosses Line1 from Right to Right\n\n" +
-					"Function implements PostGIS behaviour where top vetex of segment touching the another line not " +
-					"counted as crossing but bottom vetex of segment touching the another line is counted as crossing",
+				info: `Returns an interger value defining behaviour of crossing of lines:
+0: lines do not cross, 
+-1: "line 2" crosses "line 1" from Right to Left, 
+1: "line 2" crosses "line 1" from Left to Right, 
+-2: "line 2" crosses line 1 multiple times from Right to Left, 
+2: line 2 crosses line 1 multiple times from Left to Right, 
+-3: line 2 crosses line 1 multiple times from Left to Left, 
+3: Line 2 Multicrosses Line 1 from Right to Right.
+
+Note that the top vertex of the segment touching another line does not count as a crossing, but the bottom vertex of segment touching another line is considered a crossing.`,
 			}.String(),
 			Volatility: tree.VolatilityImmutable,
 		},
